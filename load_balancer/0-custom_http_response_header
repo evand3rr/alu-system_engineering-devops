@@ -3,27 +3,25 @@
 
 # Update package list and install Nginx
 echo "Updating package list and installing Nginx..."
-sudo apt update -y
-sudo apt install nginx -y
+sudo apt-get update
+sudo apt-get install -y nginx
 
-# Get the hostname of the server
-HOSTNAME=$(hostname)
-echo "Host name is: $HOSTNAME"
+# Creating an index page
+echo "This is Evander from Holberton School" | sudo tee /var/www/html/index.html
 
-# Modify Nginx configuration to add the custom header
-echo "Modifying Nginx configuration..."
-sudo sed -i "/server_name _;/a \    add_header X-Served-By $HOSTNAME;" /etc/nginx/sites-available/default
+# Performing a redirection
+string_for_replacement="server_name _;\n\trewrite ^\/redirect_me https:\/\/www.github.com\/evand3rr permanent;"
+
+sudo sed -i "s/server_name _;/$string_for_replacement/" /etc/nginx/sites-enabled/default
+
+#Creating a custom error page
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/page404.html
+
+#Custom HTTP response header
+sudo sed -i "server_name _;/a add_header X-Served-By $HOSTNAME;" /etc/nginx/sites-enabled/default
 
 # Test the Nginx configuration to ensure it's valid
-echo "Testing Nginx configuration..."
 sudo nginx -t
 
-# If the configuration test is successful, restart Nginx to apply changes
-if [ $? -eq 0 ]; then
-    echo "Nginx configuration is valid. Restarting Nginx..."
-    sudo systemctl restart nginx
-    echo "Nginx restarted successfully."
-else
-    echo "Nginx configuration test failed. Please check the configuration."
-    exit 1
-fi
+# Restart nginx
+sudo service nginx restart
