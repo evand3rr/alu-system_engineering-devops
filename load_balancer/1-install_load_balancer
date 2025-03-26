@@ -4,7 +4,7 @@
 # Update system and install HAProxy
 sudo apt-get -y update
 sudo apt-get -y install haproxy
-sudo chown $USER:USER /etc/haproxy/haproxy.config
+sudo chown root:haproxy /etc/haproxy/haproxy.cfg
 
 echo "
 frontend evand3rr
