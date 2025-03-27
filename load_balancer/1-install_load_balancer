@@ -4,34 +4,18 @@
 # Update system and install HAProxy
 sudo apt-get -y update
 sudo apt-get -y install haproxy
+sudo chown root:haproxy /etc/haproxy/haproxy.cfg
 
-# Backup the original haproxy.cfg
-sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
+echo "
+frontend evand3rr
+    bind *:80
+    mode http
+    default_backend app
 
-# Clean haproxy.cfg (optional)
-# sudo truncate -s 0 /etc/haproxy/haproxy.cfg
-
-# Check if the configuration for frontend and backend exists
-if ! grep -q "frontend alliane-frontend" /etc/haproxy/haproxy.cfg; then
-    # Add frontend and backend configuration
-    server_config="frontend alliane-frontend
-        bind *:80
-        mode http
-        default_backend alliane-backend
-
-    backend alliane-backend
-        balance roundrobin
-        server web-01 18.212.63.12:80 check
-        server web-02 44.211.248.36:80 check"
-
-    # Append the configuration to haproxy.cfg
-    echo "$server_config" | sudo tee -a /etc/haproxy/haproxy.cfg
-else
-    echo "Frontend and Backend configuration already exists in haproxy.cfg."
-fi
-
-# Enable HAProxy to start on boot
-echo "ENABLED=1" | sudo tee /etc/default/haproxy
+backend app
+    balance roundrobin
+    server 6432-web-01 34.227.176.224 check
+    server 6432-web-02 44.203.84.89 check" >> /etc/haproxy/haproxy.config
 
 # Restart HAProxy service
 sudo service haproxy restart
